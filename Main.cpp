@@ -4,16 +4,17 @@
 
 int main()
 {
-   std::cout << "Sierra Flight Software Assessment" << std::endl;
+   AttitudeControl attitudeControl;
+   std::cout << "Sierra Flight Software Assessment\n   Waiting for Input" << std::endl;
 
    //Start the command processor thread
    CommandProcessor::Start();
-   AttitudeControl attitudeControl;
 
    /*Continuous Control Loop */
    while(1)
    {
       attitudeControl.ProcessCommands();
+      attitudeControl.CalculatePosition();
    //SendTelemetry
    }
 

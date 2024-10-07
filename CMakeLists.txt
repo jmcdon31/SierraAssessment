@@ -9,6 +9,9 @@ add_executable(SierraSpaceAssessment
    Main.cpp
    CommandProcessor.cpp
    AttitudeControl.cpp
+   AttitudeControlMotor.cpp
+   AttitudeSensor.cpp
+   MockSpaceAxis.cpp
    )
 
 include_directories(include)

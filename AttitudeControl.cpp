@@ -2,11 +2,57 @@
 #include "CommandProcessor.h"
 #include <iostream>
 #include <sstream>
+#include <cstdio>
+#include <map>
 
-AttitudeControl::AttitudeControl()
+AttitudeControl::AttitudeControl():
+   m_ReportPosition(false)
 {
    //Note: Other command types can be register here
    CommandProcessor::RegisterAcceptor("ATTITUDE", *this);
+
+   //Create simulated axis for x, y and z
+   m_Mocks.push_back(new MockSpaceAxis());
+   m_Mocks.push_back(new MockSpaceAxis());
+   m_Mocks.push_back(new MockSpaceAxis());
+
+   //Register Motors for each axis
+   m_AttControlMotors.push_back( new AttitudeControlMotor("X", m_Mocks[0]));
+   m_AttControlMotors.push_back( new AttitudeControlMotor("Y", m_Mocks[1]));
+   m_AttControlMotors.push_back( new AttitudeControlMotor("Z", m_Mocks[2]));
+
+   //Register Sensor for each axis
+   m_AttSensors.push_back( new AttitudeSensor("X", m_Mocks[0]));
+   m_AttSensors.push_back( new AttitudeSensor("Y", m_Mocks[1]));
+   m_AttSensors.push_back( new AttitudeSensor("Z", m_Mocks[2]));
+}
+
+AttitudeControl::~AttitudeControl()
+{
+   for (auto i = 0U; i < m_Mocks.size(); i++)
+   {
+      delete &m_Mocks[i];
+      delete &m_AttControlMotors[i];
+      delete &m_AttSensors[i];
+   }
+}
+
+void AttitudeControl::CalculatePosition()
+{
+   m_AttSensors[0]->Read(m_Attitude.x);
+   m_AttSensors[1]->Read(m_Attitude.y);
+   m_AttSensors[2]->Read(m_Attitude.z);
+
+   if (m_ReportPosition)
+   {
+      printf("Pointing Towards: %s at %d, %d, %d\n",
+              GetPlanet().c_str(),
+              m_Attitude.x,
+              m_Attitude.y,
+              m_Attitude.z);
+
+      m_ReportPosition = false;
+   }
 }
 
 void AttitudeControl::ProcessCommands()
@@ -46,6 +92,11 @@ void AttitudeControl::ProcessCommands()
 
 void AttitudeControl::AttitudeCommand(std::vector<std::string>& Args)
 {
+   if (m_AttControlMotors.size() != 3)
+   {
+      std::cout << "ERROR: Attitude Control Command not setup with 3 axis" << std::endl;
+   }
+
    if (Args.size() != 4)
    {
       std::cout << "ERROR: Attitude Control Command - Invalid Number of Arguments" << std::endl;
@@ -58,9 +109,12 @@ void AttitudeControl::AttitudeCommand(std::vector<std::string>& Args)
       int x = std::stoi(Args[1]);
       int y = std::stoi(Args[2]);
       int z = std::stoi(Args[3]);
-      std::cout << "x: " << x << std::endl;
-      std::cout << "y: " << y << std::endl;
-      std::cout << "z: " << z << std::endl;
+      m_AttControlMotors[0]->Write(x);
+      m_AttControlMotors[1]->Write(y);
+      m_AttControlMotors[2]->Write(z);
+
+      //After issuing a change in attitude, make sure to report the new position
+      m_ReportPosition = true;
    }
    catch (std::invalid_argument const& ex)
    {
@@ -69,3 +123,23 @@ void AttitudeControl::AttitudeCommand(std::vector<std::string>& Args)
    }
 
 }
+
+std::string const AttitudeControl::GetPlanet()
+{
+   static const std::map<std::tuple<bool, bool, bool>, std::string> planets = {
+        {{1, 1, 1}, "GRACE"},
+        {{1, 0, 1}, "BRAY"},
+        {{1, 1, 0}, "PRICE"},
+        {{1, 0, 0}, "MIG"},
+        {{0, 1, 1}, "WIEM"},
+        {{0, 0, 1}, "TURK"},
+        {{0, 1, 0}, "MROW"},
+        {{0, 0, 0}, "SEBAS"}};
+
+   bool x =  m_Attitude.x >= 0 ? true : false;
+   bool y =  m_Attitude.y >= 0 ? true : false;
+   bool z =  m_Attitude.z >= 0 ? true : false;
+   return planets.at({x, y, z});
+
+}
+

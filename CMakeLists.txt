@@ -7,6 +7,8 @@ project(SierraSpaceAssessment)
 
 add_executable(SierraSpaceAssessment
    Main.cpp
+   CommandProcessor.cpp
+   AttitudeControl.cpp
    )
 
 include_directories(include)

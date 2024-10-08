@@ -10,8 +10,12 @@ class CommandAcceptor
 {
 public:
 
+   /**
+    * @brief A virtual method that children will implement to empty out the command queue */
    virtual void ProcessCommands() = 0;
 
+   /**
+    * @brief Add a command string to the command queue */
    void AddCommand(std::string Command)
    {
       m_mutex.lock();
@@ -23,4 +27,5 @@ protected:
    std::queue<std::string> m_Commands;
    std::mutex              m_mutex;
 };
+
 #endif /* COMMAND_ACCEPTOR_H */

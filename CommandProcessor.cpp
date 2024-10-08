@@ -19,15 +19,21 @@ void CommandProcessor::ProcessCommands()
 {
    while(1)
    {
+      //NOTE: in order to fit the prompt and not force users to write a specific comand type,
+      //hard code the command type here for now.
       std::string FAKE_COMMAND = "ATTITUDE ";
+
       std::string input;
       std::getline(std::cin, input);
-      //NOTE: I am adding a hard coded command here for the example
+
+      //NOTE:adding a hard coded command here for the example
       input = FAKE_COMMAND + input;
       if (ValidCommand(input))
       {
          std::string command = GetCommandType(input);
 
+         //Note: this could be modified easily to permit multiple acceptors for a single command
+         //Check for Command Acceptors for this type
          auto acceptor = m_RegisterdAcceptors.find(command);
          if ( acceptor != m_RegisterdAcceptors.end())
          {
@@ -42,10 +48,6 @@ void CommandProcessor::ProcessCommands()
       {
          std::cout << "ERROR: Invalid Command " << input << std::endl;
       }
-
-
-      //NOTE: Here I would check to verify that the Command is a registered command, but for our 
-      //example case we only have 1 command type which I have hard coded
    }
 
 }
@@ -66,7 +68,8 @@ bool CommandProcessor::ValidCommand(std::string& Command)
 
    (void)Command;
    //NOTE: This would normally do some more robust checking to verify the header, size, and format
-   //For this example it is hard coded to be true as we assume the command packets are valid
+   //For this example it is hard coded to be true as we assume the command packets structure is 
+   //valid
    return true;
 }
 
@@ -75,7 +78,7 @@ std::string CommandProcessor::GetCommandType(std::string& Command)
    std::stringstream ss(Command);
    std::string command;
    //NOTE: This would normally parse out the command type from a valid packet and return it.
-   //for this implementation we assume the first word is the command type.
+   //for this implementation the first word is the command type.
    getline(ss, command, ' ');
    return command;
 }

@@ -5,17 +5,18 @@
 int main()
 {
    AttitudeControl attitudeControl;
-   std::cout << "Sierra Flight Software Assessment\n   Waiting for Input" << std::endl;
+   std::cout << "Sierra Flight Software Assessment" << std::endl;
+   std::cout << "   waiting for input" << std::endl;
 
    //Start the command processor thread
    CommandProcessor::Start();
 
    /*Continuous Control Loop */
-   while(1)
+   while(true)
    {
       attitudeControl.ProcessCommands();
       attitudeControl.CalculatePosition();
-   //SendTelemetry
+      //TODO: SendTelemetry to ground
    }
 
    return 0;

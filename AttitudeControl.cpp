@@ -6,7 +6,7 @@
 #include <map>
 
 AttitudeControl::AttitudeControl():
-   m_ReportPosition(false)
+   m_ReportAttitude(false)
 {
    //Note: Other command types can be register here
    CommandProcessor::RegisterAcceptor("ATTITUDE", *this);
@@ -43,7 +43,8 @@ void AttitudeControl::CalculatePosition()
    m_AttSensors[1]->Read(m_Attitude.y);
    m_AttSensors[2]->Read(m_Attitude.z);
 
-   if (m_ReportPosition)
+   //Only report position if flag has been set when attitude changed
+   if (m_ReportAttitude)
    {
       printf("Pointing Towards: %s at %d, %d, %d\n",
               GetPlanet().c_str(),
@@ -51,7 +52,7 @@ void AttitudeControl::CalculatePosition()
               m_Attitude.y,
               m_Attitude.z);
 
-      m_ReportPosition = false;
+      m_ReportAttitude = false;
    }
 }
 
@@ -114,7 +115,7 @@ void AttitudeControl::AttitudeCommand(std::vector<std::string>& Args)
       m_AttControlMotors[2]->Write(z);
 
       //After issuing a change in attitude, make sure to report the new position
-      m_ReportPosition = true;
+      m_ReportAttitude = true;
    }
    catch (std::invalid_argument const& ex)
    {

@@ -4,12 +4,30 @@ My Approach to this problem was to try and showcase a variety of c++ and Flight 
 I created a Multi Threaded Application that utilizes a continuous control loop on the main thread 
 to maintain attitude and ground command routing thread to receive commands.
 
-I utilize a base CommandAcceptor class to let each object that wishes to process commands Register with a telemetry class for the command routing.
+I utilize a base CommandAcceptor class to let each object that wishes to process commands Register with a Command Routing class for the command routing.
 
 The AttitudeControl class utilizes generic Motor and Sensor interfaces to interact with the environment. I also Create a Mock environment class called MockSpaceAxis, that inherits the motor and sensor interface bases, which is intended to close the loop between writing out Motor commands and receiving Sensor data for the current Attitude.
 
+The solution may seem complex at first, but has been architected with scalability in mind. Adding additional commands, sensors, and features should fit into the design easily.
+
 ## Building The Assessment
 I utilized Ubuntu 22.04 to build this Assessment. It uses the CMake Build system. I created 2 simple scripts to configure and build the application. Assuming the User has at least CMake 3.20 and GCC 11 they should be able to build and run with the following commands
+```
+:~/SierraAssessment$ ./scripts/configure.sh
+
+:~/SierraAssessment$ ./scripts/build.sh
+```
+
+After building the project, users will find an executable called **SierraSpaceAssessment** in the build directory.
+
+```
+:~/SierraAssessment$ ./build/SierraAssessment
+```
+
+Alternatively, users can compile the solution with the following command:
+```
+g++-11 -std=c++11 -Wall -Wextra -Wpedantic -Werror -O2 -Iinclude Main.cpp CommandProcessor.cpp AttitudeControl.cpp AttitudeControlMotor.cpp AttitudeSensor.cpp MockSpaceAxis.cpp -o SierraSpaceAssessment
+```
 
 ## Guidelines:
 

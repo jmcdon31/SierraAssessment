@@ -14,4 +14,3 @@ add_executable(SierraSpaceAssessment
    MockSpaceAxis.cpp
    )
 
-include_directories(include)
